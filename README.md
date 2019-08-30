@@ -38,7 +38,7 @@ Monocle 3's quite easily reverted to version 2. Just call this: `sudo R -e 'remo
 
 * Log in to [Eta](http://eta.internal.sanger.ac.uk), go to the Compute tab, then Instances, press Launch Instance.
 * In Details, name the instance something informative.
-* In Source, under Select Boot Source, select Instance Snapshot. In the list that appears, find `basecloud` and press the little up arrow to the right.
+* In Source, under Select Boot Source, select Image (or Instance Snapshot if you saved an image before). In the list that appears, find `basecloud` and press the little up arrow to the right.
 * Switch to Flavor. The flavours are a dropdown of available resource allocations you can request. Pick any `m1` flavour `m1.small` or above. If you need more cores to run something, by all means go for it! However, be mindful of your tools' abilities to actually effectively use cores and RAM, and if you go for heavier flavours be extra vigilant with removing idle instances.
 * In Networks, ensure that `cloudforms_network` is part of the network list. If it isn't, press the up arrow on the right hand side of its row and it should move up.
 * In Security Groups, press the up arrow on the right hand side of the `cloudforms_icmp_in` and `cloudforms_ssh_in` rows.
@@ -62,9 +62,14 @@ Now you can just SSH or `rsync` with the cloud just by specifying the name you c
 
 Once you SSH into the machine, you need to mount the volume you created. The following code chunk creates a file system on the drive space provided (skip if you're reattaching a volume you already used in another instance), mounts it, tweaks an internal configuration file to acknowledge its existence, makes you (ubuntu) the owner and then quickly "jogs" it to see that it works. In the summer of 2017, sometimes the volumes would spawn wrong and would hang the moment they were asked to do anything borderline resembling saving files, so the precautionary measure has been kept in place as a diagnostic tool.
 
-	#start here if creating new volume
+	# Start here if creating new volume
 	sudo mkfs.ext4 /dev/vdb
-	#start here if reattaching existing volume
+	# 
+	#
+	#
+	#
+	#
+	#start below if reattaching existing volume
 	sudo mount /dev/vdb /mnt
 	echo -e "/dev/vdb\t/mnt\text4\tdefaults\t0\t0" | sudo tee -a /etc/fstab
 	sudo chown -R ubuntu: /mnt
@@ -84,15 +89,17 @@ And with that, you're good to go! Make use of a number of popular R/python packa
 
 ### Using Rstudio and jupyter notebooks/labs
 
-If you intend to use your machine for Rstudio/jupyter notebooks from the comfort of your own computer, call the following command in your terminal:
-
-	ssh -f ubuntu@<floating-ip> -L 8000:localhost:8000 -L 8765:localhost:8765 -N
-
-This will set up the ability to use Rstudio on `localhost:8765` (log in as ubuntu with a password of rstudio), and any jupyter notebooks you may spawn on `localhost:8000`. This will persist until you disconnect from the internal Sanger network. Spawning jupyter notebooks is quite easy - SSH into the instance, open up your friend `screen -DR`, navigate to the folder of relevance and call the following (if you wish to use labs, just write `jupyter lab` instead of `jupyter notebook`):
+Spawning jupyter notebooks is quite easy - SSH into the instance, open up your friend `screen -DR`, navigate to the folder of relevance and call the following (if you wish to use labs, just write `jupyter lab` instead of `jupyter notebook`):
 
 	jupyter notebook --no-browser --port=8000
 
-Copy the link that you get given, paste it into your browser and you're good to go. After the first time for a given notebook, you can go back to `localhost:8000`. Upon disconnecting from the Sanger internal network, you'll have to call `ssh -f` again to reestablish the link, plus close any open notebook tabs in your browser and launch a fresh `localhost:8000`. If you choose to instead follow the restart kernel prompt, you'll lose all your run information, as if you closed the notebook server entirely and loaded the notebook anew.
+If you intend to use your machine for Rstudio/jupyter notebooks from the comfort of your own computer, call the following command in your local terminal:
+
+	ssh -f ubuntu@<floating-ip> -L 8000:localhost:8000 -L 8765:localhost:8765 -N
+
+This will set up the ability to use Rstudio on `localhost:8765` (log in as ubuntu with a password of rstudio), and any jupyter notebooks you may spawn on `localhost:8000`. This will persist until you disconnect from the internal Sanger network. 
+
+Copy the link that you get given from the instance terminal, paste it into your browser and you're good to go. After the first time for a given notebook, you can go back to `localhost:8000`. Upon disconnecting from the Sanger internal network, you'll have to call `ssh -f` again to reestablish the link, plus close any open notebook tabs in your browser and launch a fresh `localhost:8000`. If you choose to instead follow the restart kernel prompt, you'll lose all your run information, as if you closed the notebook server entirely and loaded the notebook anew.
 
 ### Communicating with the farm and your computer
 
