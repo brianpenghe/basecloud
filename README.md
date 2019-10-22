@@ -101,6 +101,16 @@ This will set up the ability to use Rstudio on `localhost:8765` (log in as ubunt
 
 Copy the link that you get given from the instance terminal, paste it into your browser and you're good to go. After the first time for a given notebook, you can go back to `localhost:8000`. Upon disconnecting from the Sanger internal network, you'll have to call `ssh -f` again to reestablish the link, plus close any open notebook tabs in your browser and launch a fresh `localhost:8000`. If you choose to instead follow the restart kernel prompt, you'll lose all your run information, as if you closed the notebook server entirely and loaded the notebook anew.
 
+##### If you don't want to use localhost
+
+you can edit the file /home/ubuntu/.jupyter/jupyter_notebook_config.py
+
+Delete the palm and set
+
+	c.NotebookApp.ip = '0.0.0.0'
+
+Then run Jupyter command from Openstack and then go to the web address it gives (pay attention to the parenthesis after http).
+
 ### Communicating with the farm and your computer
 
 You can quite easily move stuff between the cloud and the farm or your computer as desired. You can SSH into the farm from your machine by typing out the full farm address:
